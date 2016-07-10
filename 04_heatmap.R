@@ -64,6 +64,7 @@ means_melt$variable = factor(
     ordered = T
     )
 
+pdf("figures/heatmap.pdf", width=44, paper="a4r")
 print(ggplot(means_melt,
              aes(cluster, variable)) +
              geom_tile(aes(fill = value)) +
@@ -73,3 +74,4 @@ print(ggplot(means_melt,
              theme_tufte(base_size = 25) +
              scale_alpha_discrete(name = "Rel. Frequency")
 )
+dev.off()

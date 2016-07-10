@@ -1,37 +1,81 @@
+# TODO: header
+# Clean workspace
 rm(list=ls())
-source("01_prepare_data.R")
-source("02_functions.R")
 
-# Load Libraries
+# Prepare the data (labels and such)
+source("01_prepare_data.R")
+
+# Load required Libraries
 # ggplot2, ggthemes, cluster, maps, vegan
 library(vegan)
 
 # Load Functions
+source("02_functions.R")
 
-# Results
-
-## Number of clusters
+# Define: Number of clusters, Number of countries
 n_cluster = 10 #TODO: why 10?
 n_countries = 194 #TODO: dynamic
 
-# Run different measures
-# * Gower, Jaccard, Kulczynski, Mountford, Euclidean, Canberra, Manhatten
+# Run different measures and create experimental plots for each
+
+# Jaccard
 source("05_jaccard.R")
 cluster_vector = jaccard_cut # cluster numbers (index by row)
 cluster_table = jaccard_clust # full table incl. cluster nos
-#get_means(jaccard_clust)
-#get_names(jaccard_clust)
 
-# As well as
-# * Divisive Clustering
-# * PAM
-# For each generate:
-# * List of cluster names (get_names())
-# * Means for all clusters (get_means())
+# Kulczynski
+# source("05_kulczynski.R")
+# cluster_vector = kulczynski_cut
+# cluster_table = kulczynski_clust
+
+# Mountford
+# source("05_mountford.R")
+# cluster_vector = mountford_cut
+# cluster_table = mountford_clust
+
+# Euclidean
+# source("05_euclid.R")
+# cluster_vector = euclid_cut
+# cluster_table = euclid_clust
+
+# Canberra
+# source("05_canberra.R")
+# cluster_vector = canberra_cut
+# cluster_table = canberra_clust
+
+# Manhatten
+# source("05_manhattan.R")
+# cluster_vector = manhattan_cut
+# cluster_table = manhattan_clust
+
+# Gower
+# source("05_gower.R")
+# cluster_vector = gower_cut
+# cluster_table = gower_clust
+
+# Divisive clustering
+# source("05_gower.R")
+# div_cluster = diana(gower_measure, diss = T)
+# div_cut = cutree(div_cluster, k = n_cluster)
+# div_clust = cbind(dat_cluster, "cluster" = div_cut)
+# cluster_vector = div_cut
+# cluster_table = div_clust
+
+# PAM
+# source("05_gower.R")
+# pam_cluster = pam(gower_measure, diss = T, k = n_cluster)
+# pam_vector = pam_cluster$clustering
+# pam_clust = cbind(dat_cluster, "cluster" = pm_vector)
+# cluster_vector = pam_vector
+# cluster_table = pam_clust
+
+# Decide for one measure (Jaccard) and create publication ready plots
 
 # Plot Worldmap
+source("03_worldmap.R")
 
 # Plot Heatmap
+source("04_heatmap.R")
 
 # Plot Dendrogram
 library(dendextend)
