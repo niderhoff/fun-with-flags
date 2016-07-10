@@ -1,6 +1,7 @@
 # TODO: documentation, bug below
 library(reshape2)
 library(ggplot2)
+library(ggthemes)
 
 # Add labels to the raw binary data table
 bin_labeled = data.frame(
@@ -38,14 +39,37 @@ cluster_melt$variable = factor(
     ordered = T
 )
 
-# Plot the chloropleth
 # FIXME: this doesn't work (discrete scale error)
-ggplot(cluster_melt, aes(name, variable)) +
-    geom_tile(aes(fill = value), colour = "white") +
-    scale_fill_manual(values = c("0" = "white", "1" = "blue")) +
-    facet_grid(. ~ cluster, scale = "free") +
-    theme(axis.text.x = element_text(angle = 330,
-                                     hjust = 0,
-                                     colour = "grey50"))
+# ggplot(cluster_melt, aes(name, variable)) +
+#     geom_tile(aes(fill = value), colour = "white") +
+#     scale_fill_manual(values = c("0" = "white", "1" = "blue")) +
+#     facet_grid(. ~ cluster, scale = "free") +
+#     theme(axis.text.x = element_text(angle = 330,
+#                                      hjust = 0,
+#                                      colour = "grey50"))
 
 # Means only
+means = as.data.frame(get_means(cluster_table))
+colnames(means) = 1:length(colnames(means))
+means = cbind("variable" = rownames(means), means)
+
+means_melt = melt(means, id.vars = 1)
+colnames(means_melt) = c("variable", "cluster", "value")
+# Was ist das?
+grp <- rep(c(1,1,2,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4), n_cluster)
+means_melt = cbind(means_melt, grp)
+means_melt$variable = factor(
+    means_melt$variable,
+    levels = manual_levels,
+    ordered = T
+    )
+
+print(ggplot(means_melt,
+             aes(cluster, variable)) +
+             geom_tile(aes(fill = value)) +
+             scale_fill_gradient(low = "white", high = "black") +
+             scale_x_discrete(expand = c(0, 0), name = "Cluster") +
+             scale_y_discrete(expand = c(0, 0), name = "Variable") +
+             theme_tufte(base_size = 25) +
+             scale_alpha_discrete(name = "Rel. Frequency")
+)
