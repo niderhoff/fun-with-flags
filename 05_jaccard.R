@@ -1,8 +1,8 @@
 # Hierarchical Cluster Analysis using the Jaccard Measure
 
 # Requirements: library(vegan)
-
-jaccard_measure = vegdist(bin_dat, method="jaccard")
+current_measure = "jaccard"
+jaccard_measure = vegdist(bin_dat, method=current_measure)
 jaccard_hclust = hclust(jaccard_measure)
 
 # plot(jaccard_hclust,

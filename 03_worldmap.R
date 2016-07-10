@@ -4,6 +4,10 @@ library(ggthemes)
 library(maps)
 world = map_data("legacy_world")
 
+print(paste(
+    "Generating worldmap for", capwords(current_measure), "measure", sep = " ")
+)
+
 # TODO: überprüfen warum das ersetzen der Länder auf einmal nicht
 #       mehr notwendig sein soll..
 # Namen in Cluster-Dataframe ersetzen bei Ländern deren Namen im
@@ -33,7 +37,7 @@ world = map_data("legacy_world")
 # # Ende Ersetzen
 
 # TODO: den code hier schöner machen
-clustered_fin = jaccard_clust
+clustered_fin = cluster_table
 
 # Cluster-Dataframe Zeile kopieren für Länder, die damals noch nicht vorhanden
 # waren, aber schon auf der Weltkarte existieren.
@@ -53,14 +57,17 @@ clustered_fin = rbind(clustered_fin,Namibia,WestSahara,
                        Sicily,Sardinia)
 
 # Cluster auf Länder der Weltkarte mappen und plotten
-# FIXME: choropleth?
 mergedata = merge(world, clustered_fin, by.x = "region", by.y = "name")
-choropleth = mergedata[order(mergedata$order),]
-pdf("figures/cluster_map.pdf", width=44, paper="a4r")
-print(ggplot(choropleth, aes(long,lat,group=group)) +
+mergedata = mergedata[order(mergedata$order),]
+
+path = paste("figures/", current_measure, "_worldmap.pdf", sep="")
+pdf(path, width=44, paper="a4r")
+print(ggplot(mergedata, aes(long,lat,group=group)) +
   geom_polygon(aes(fill = factor(cluster)), size = 0.2) +
     scale_fill_brewer(palette = "Paired",name="Cluster") +
 #    scale_x_discrete(name="Longitutde", breaks=c(-100,0,100)) +
   geom_polygon(data=world, colour="black", fill=NA) +
   theme_tufte(base_size=25))
 dev.off()
+
+print("Done.")

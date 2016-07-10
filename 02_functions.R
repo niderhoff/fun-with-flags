@@ -1,4 +1,15 @@
 # TODO: better documentation
+
+# A simple function for 'Mixed Case' capitalizing from R-Help
+capwords = function(x, strict = FALSE) {
+    cap = function(x) paste(
+            toupper(substring(x, 1, 1)),
+            {x = substring(x, 2); if(strict) tolower(x) else x },
+            sep = "", collapse = " "
+        )
+    sapply(strsplit(x, split = " "), cap, USE.NAMES = !is.null(names(x)))
+}
+
 # x=data with cluster variable
 get_means <- function(x) {
   R <- max(x$cluster)

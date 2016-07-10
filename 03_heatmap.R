@@ -3,6 +3,10 @@ library(reshape2)
 library(ggplot2)
 library(ggthemes)
 
+print(paste(
+    "Generating heatmap for", capwords(current_measure), "measure", sep = " ")
+)
+
 # Add labels to the raw binary data table
 bin_labeled = data.frame(
     "name" = as.character(dat_cluster$name),
@@ -64,7 +68,8 @@ means_melt$variable = factor(
     ordered = T
     )
 
-pdf("figures/heatmap.pdf", width=44, paper="a4r")
+path = paste("figures/", current_measure, "_heatmap.pdf", sep="")
+pdf(path, width = 44, paper = "a4r")
 print(ggplot(means_melt,
              aes(cluster, variable)) +
              geom_tile(aes(fill = value)) +
@@ -75,3 +80,5 @@ print(ggplot(means_melt,
              scale_alpha_discrete(name = "Rel. Frequency")
 )
 dev.off()
+
+print("Done.")
