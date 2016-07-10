@@ -6,8 +6,9 @@ rm(list=ls())
 source("01_prepare_data.R")
 
 # Load required Libraries
-# ggplot2, ggthemes, cluster, maps, vegan
+# ggplot2, ggthemes, cluster, maps, vegan, RColorBrewer, dendextend
 library(vegan)
+library(cluster)
 
 # Load Functions
 source("02_functions.R")
@@ -38,28 +39,33 @@ for (i in 1:length(hierarch_measures)) {
 }
 
 # Gower
-# source("05_gower.R")
-# cluster_vector = gower_cut
-# cluster_table = gower_clust
-# source("03_worldmap.R")
-# source("03_heatmap.R")
+current_measure = "gower"
+source("05_gower.R")
+#source("03_worldmap.R")
+#source("03_heatmap.R")
+#source("03_dendrogram.R")
 
 # Divisive clustering
-# source("05_gower.R")
-# div_cluster = diana(gower_measure, diss = T)
+# # source("05_gower.R")
+# current_measure = "divisive"
+# div_cluster = diana(gower_measure, diss = TRUE)
 # div_cut = cutree(div_cluster, k = n_cluster)
 # div_clust = cbind(dat_cluster, "cluster" = div_cut)
 # cluster_vector = div_cut
 # cluster_table = div_clust
 # source("03_worldmap.R")
 # source("03_heatmap.R")
+# source("03_dendrogram.R")
 
 # PAM
 # source("05_gower.R")
-# pam_cluster = pam(gower_measure, diss = T, k = n_cluster)
-# pam_vector = pam_cluster$clustering
-# pam_clust = cbind(dat_cluster, "cluster" = pm_vector)
-# cluster_vector = pam_vector
-# cluster_table = pam_clust
-# source("03_worldmap.R")
-# source("03_heatmap.R")
+current_measure = "PAM"
+pam_cluster = pam(gower_measure, diss = T, k = n_cluster)
+pam_vector = pam_cluster$clustering
+pam_clust = cbind(dat_cluster, "cluster" = pam_vector)
+cluster_vector = pam_vector
+cluster_table = pam_clust
+source("03_worldmap.R")
+source("03_heatmap.R")
+# TODO: dendrogram doesn't really work with PAM this way..
+#source("03_dendrogram.R")
