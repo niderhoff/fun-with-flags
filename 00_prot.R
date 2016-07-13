@@ -14,8 +14,8 @@ library(cluster)
 source("02_functions.R")
 
 # Define: Number of clusters, Number of countries
-n_cluster = 10 #TODO: why 10?
-n_countries = 194 #TODO: dynamic
+n_cluster = 10
+n_countries = dim(dataset)[1]
 
 # Run different measures and create experimental plots for each
 
