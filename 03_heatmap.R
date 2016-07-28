@@ -1,76 +1,68 @@
-# TODO: documentation, bug below
+# Crate Heatmap
 library(reshape2)
 library(ggplot2)
 library(ggthemes)
 
 print(paste(
-    "Generating heatmap for", capwords(current_measure), "measure", sep = " ")
+    "Generating heatmap for", capwords(current.measure), "measure", sep = " ")
 )
 
 # Add labels to the raw binary data table
-bin_labeled = data.frame(
-    "name" = as.character(dat_cluster$name),
-    bin_dat,
-    "cluster" = cluster_vector,
-    stringsAsFactors = F
+bin.labeled = data.frame(
+    "name"           = as.character(dat.cluster$name),
+    bin.dat,
+    "cluster"        = cluster.vector,
+    stringsAsFactors = FALSE
     )
-colnames(bin_labeled) = c(colnames(dat_cluster),"cluster")
+colnames(bin.labeled) = c(colnames(dat.cluster),"cluster")
 
 # Order by Cluster
-bin_labeled = bin_labeled[order(bin_labeled$cluster),]
+bin.labeled = bin.labeled[order(bin.labeled$cluster),]
 
 # Put into long format for ggplot using melt()
-cluster_melt = data.frame()
-cluster_levels = c()
-for (i in unique(cluster_vector)) {
-    clusterx = subset(bin_labeled, cluster == i)[,1:19]
-    clusterx_melt = melt(clusterx, id.vars = 1, variable_name = "name")
-    clusterx_melt = cbind(clusterx_melt, "cluster" = i)
-    cluster_melt = rbind(cluster_melt,clusterx_melt)
+cluster.melt   = data.frame()
+cluster.levels = c()
+for (i in unique(cluster.vector)) {
+    clusterx      = subset(bin.labeled, cluster == i)[,1:19]
+    clusterx.melt = melt(clusterx, id.vars = 1, variable_name = "name")
+    clusterx.melt = cbind(clusterx.melt, "cluster" = i)
+    cluster.melt  = rbind(cluster.melt,clusterx.melt)
 }
 
-# Sort manually
-
-manual_levels = c(
+# Define manual sorting order
+manual.levels = c(
     "icon", "animate", "triangle", "crescent", "text",
     "sunstars", "saltires", "quarters", "crosses", "circles", "bars",
     "stripes", "red", "green", "blue", "gold", "white", "black", "orange"
 )
 
-cluster_melt$variable = factor(
-    cluster_melt$variable,
-    levels = manual_levels,
-    ordered = T
+# Manually sort factor levels with above defined order
+cluster.melt$variable = factor(
+    cluster.melt$variable,
+    levels  = manual.levels,
+    ordered = TRUE
 )
 
-# FIXME: this doesn't work (discrete scale error)
-# ggplot(cluster_melt, aes(name, variable)) +
-#     geom_tile(aes(fill = value), colour = "white") +
-#     scale_fill_manual(values = c("0" = "white", "1" = "blue")) +
-#     facet_grid(. ~ cluster, scale = "free") +
-#     theme(axis.text.x = element_text(angle = 330,
-#                                      hjust = 0,
-#                                      colour = "grey50"))
+# Extract the means to plot in the heatmap
+means                = as.data.frame(GetMeans(cluster.table))
+colnames(means)      = 1:length(colnames(means))
+means                = cbind("variable" = rownames(means), means)
+means.melt           = melt(means, id.vars = 1)
+colnames(means.melt) = c("variable", "cluster", "value")
 
-# Means only
-means = as.data.frame(get_means(cluster_table))
-colnames(means) = 1:length(colnames(means))
-means = cbind("variable" = rownames(means), means)
+grp        = rep(c(1,1,2,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4), n.cluster)
+means.melt = cbind(means.melt, grp)
 
-means_melt = melt(means, id.vars = 1)
-colnames(means_melt) = c("variable", "cluster", "value")
-# Was ist das?
-grp <- rep(c(1,1,2,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4), n_cluster)
-means_melt = cbind(means_melt, grp)
-means_melt$variable = factor(
-    means_melt$variable,
-    levels = manual_levels,
-    ordered = T
+means.melt$variable = factor(
+    means.melt$variable,
+    levels  = manual.levels,
+    ordered = TRUE
     )
 
-path = paste("figures/", current_measure, "_heatmap.pdf", sep="")
+# Generate plot
+path = paste("figures/", current.measure, "_heatmap.pdf", sep="")
 pdf(path, width = 44, paper = "a4r")
-print(ggplot(means_melt,
+print(ggplot(means.melt,
              aes(cluster, variable)) +
              geom_tile(aes(fill = value)) +
              scale_fill_gradient(low = "white", high = "black") +

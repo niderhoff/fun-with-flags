@@ -1,9 +1,9 @@
-# Data preparation
+# Prepare the flag dataset to be usable in the analysis
 
 # Read dataset, thereby defining which variables are factors
 dataset = read.table(
-    file = "./flagdata.txt",
-    sep = ",",
+    file       = "./flagdata.txt",
+    sep        = ",",
     colClasses = c(
         'factor','factor','factor','integer','integer','factor',
         'factor','integer','integer','integer','factor','factor','factor',
@@ -49,17 +49,19 @@ levels(dataset$orange) = c("Absent", "Present")
 
 levels(dataset$crescent)[2] = "Moon"
 levels(dataset$triangle)[2] = "Triangle"
-levels(dataset$icon)[2] = "Inanimate"
-levels(dataset$animate)[2] = "Animate"
-levels(dataset$text)[2] = "Text"
+levels(dataset$icon)[2]     = "Inanimate"
+levels(dataset$animate)[2]  = "Animate"
+levels(dataset$text)[2]     = "Text"
+
+# Set all others to "Else"
 levels(dataset$crescent)[1] =
 levels(dataset$triangle)[1] =
-levels(dataset$icon)[1] =
-levels(dataset$animate)[1] =
-levels(dataset$text)[1] = "Else"
+levels(dataset$icon)[1]     =
+levels(dataset$animate)[1]  =
+levels(dataset$text)[1]     = "Else"
 
 # Create a subet with the columns we are interested in
-dat_cluster = dataset[,
+dat.cluster = dataset[,
     !(names(dataset) %in% c(
         "landmass", "zone", "area", "population", "language", "religion",
         "colours", "mainhue", "topleft", "botright"
@@ -67,34 +69,34 @@ dat_cluster = dataset[,
     ]
 
 # Convert numeric variables to binary factors
-# TODO: rewrite using lapply maybe?
-dat_cluster$bars[dat_cluster$bars > 0] = 1
-dat_cluster$stripes[dat_cluster$stripes > 0] = 1
-dat_cluster$circles[dat_cluster$circles > 0] = 1
-dat_cluster$crosses[dat_cluster$crosses > 0] = 1
-dat_cluster$saltires[dat_cluster$saltires > 0] = 1
-dat_cluster$quarters[dat_cluster$quarters > 0] = 1
-dat_cluster$sunstars[dat_cluster$sunstars > 0] = 1
+# TODO: rewrite using lapply
+dat.cluster$bars[dat.cluster$bars > 0]         = 1
+dat.cluster$stripes[dat.cluster$stripes > 0]   = 1
+dat.cluster$circles[dat.cluster$circles > 0]   = 1
+dat.cluster$crosses[dat.cluster$crosses > 0]   = 1
+dat.cluster$saltires[dat.cluster$saltires > 0] = 1
+dat.cluster$quarters[dat.cluster$quarters > 0] = 1
+dat.cluster$sunstars[dat.cluster$sunstars > 0] = 1
 
-dat_cluster$bars = factor(dat_cluster$bars,
+dat.cluster$bars = factor(dat.cluster$bars,
                           labels=c("No Bars", "Bars"))
-dat_cluster$stripes = factor(dat_cluster$stripes,
+dat.cluster$stripes = factor(dat.cluster$stripes,
                              labels=c("No Stripes", "Stripes"))
-dat_cluster$circles = factor(dat_cluster$circles,
+dat.cluster$circles = factor(dat.cluster$circles,
                              labels=c("No Circles", "Circles"))
-dat_cluster$crosses = factor(dat_cluster$crosses,
+dat.cluster$crosses = factor(dat.cluster$crosses,
                              labels=c("No Crosses", "Crosses"))
-dat_cluster$saltires = factor(dat_cluster$saltires,
+dat.cluster$saltires = factor(dat.cluster$saltires,
                               labels=c("No Saltires", "Saltires"))
-dat_cluster$quarters = factor(dat_cluster$quarters,
+dat.cluster$quarters = factor(dat.cluster$quarters,
                               labels=c("No Quarters", "Quarters"))
-dat_cluster$sunstars = factor(dat_cluster$sunstars,
+dat.cluster$sunstars = factor(dat.cluster$sunstars,
                               labels=c("No Sunstars", "Sunstars"))
 
+# Binary matrix for later usage
 # TODO: this is really bad & ugly.
-# Binary matrix for later usage(?)
-bin_dat <- matrix(rep(NA, 19*194), ncol=19, nrow=194)
-for (i in 2:ncol(dat_cluster)){
-    bin_dat[,i-1] <- as.numeric(dat_cluster[,i])-1
+bin.dat <- matrix(rep(NA, 19*194), ncol=19, nrow=194)
+for (i in 2:ncol(dat.cluster)){
+    bin.dat[,i-1] <- as.numeric(dat.cluster[,i])-1
 }
 

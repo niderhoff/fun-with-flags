@@ -5,8 +5,10 @@ library(maps)
 world = map_data("legacy_world")
 
 print(paste(
-    "Generating worldmap for", capwords(current_measure), "measure", sep = " ")
+    "Generating worldmap for", capwords(current.measure), "measure", sep = " ")
 )
+
+# Manual changes to how the clusters are plotted on the map.
 
 # Bermuda, Faeroes, Germany DDR, Gibraltar, Guam, Hong Kong, Kampuchea,
 # Marianas, Netherlands Antilles, Niue, Singapore, South Yemen, Saint Helena,
@@ -16,7 +18,7 @@ print(paste(
 # equivalent, we used that instead. An example would be North and South Yemen
 # where we used the cluster data for North Yemen as the data for today's Yemen
 # since North Yemen's closer resembles the flag of Yemen.
-newnames = c(
+new.names = c(
         "Antigua", "Argentina",
         "Bermuda", "Virgin Islands", "Burkina Faso",
         "Myanmar", "Cape Verde", "Comoros", "Faeroes",
@@ -30,27 +32,27 @@ newnames = c(
         "Virgin Islands", "Vatican City", "Samoa"
 )
 
-# convert names from factor to character since we are done with analysis
+# Convert names from factor to character since we are done with analysis
 # TODO: this could be solved better, but using levels() screws everthing up.
-cluster_table$name = as.character(cluster_table$name)
-changed_names = cluster_table$name[!is.element(
-    cluster_table$name,
+cluster.table$name = as.character(cluster.table$name)
+changed.names      = cluster.table$name[!is.element(
+    cluster.table$name,
     sort(unique(world$region))
 )]
 # We can actually fix a lot of the country mapping mistakes by replacing
-# hyphens with a space as in "American-Samoa" -> "American Samoa"
-changed_names = gsub("-", " ", changed_names)
+# hyphens with a space as in "American-Samoa" --> "American Samoa"
+changed.names = gsub("-", " ", changed.names)
 
 # The remaining ones will be replaced manually with above defined values
-changed_names[!is.element(
-    changed_names,
+changed.names[!is.element(
+    changed.names,
     sort(unique(world$region))
-)] = newnames
+)] = new.names
 
-cluster_table$name[!is.element(
-    cluster_table$name,
+cluster.table$name[!is.element(
+    cluster.table$name,
     sort(unique(world$region))
-)] = changed_names
+)] = changed.names
 
 # Now we have to match clusters data with countries that are different in the
 # flag data set than in the world map file. Sicily is there considered part of
@@ -58,26 +60,27 @@ cluster_table$name[!is.element(
 # South Africa when the data set was created. Western Sahara is considered part
 # of Morocco.
 
-cluster_table = rbind(cluster_table,
-    replace(cluster_table[154,], 1, "Namibia"),
-    replace(cluster_table[118,], 1, "Western Sahara"),
-    replace(cluster_table[88,], 1, "Sicily"),
-    replace(cluster_table[88,], 1, "Sardinia")
+cluster.table = rbind(cluster.table,
+    replace(cluster.table[154,], 1, "Namibia"),
+    replace(cluster.table[118,], 1, "Western Sahara"),
+    replace(cluster.table[88,], 1, "Sicily"),
+    replace(cluster.table[88,], 1, "Sardinia")
 )
-# FIXME: wrong rownames for new duplicate rows
+# FIXME: wrong rownames for new duplicate rows (only visible on the dataframe)
 
-# Cluster auf Länder der Weltkarte mappen und plotten
-mergedata = merge(world, cluster_table, by.x = "region", by.y = "name")
+# Reference clusters to countries on the world map
+mergedata = merge(world, cluster.table, by.x = "region", by.y = "name")
 mergedata = mergedata[order(mergedata$order),]
 
-path = paste("figures/", current_measure, "_worldmap.pdf", sep="")
+# Generate plot
+path = paste("figures/", current.measure, "_worldmap.pdf", sep="")
 pdf(path, width=44, paper="a4r")
 print(ggplot(mergedata, aes(long,lat,group=group)) +
-  geom_polygon(aes(fill = factor(cluster)), size = 0.2) +
+    geom_polygon(aes(fill = factor(cluster)), size = 0.2) +
     scale_fill_brewer(palette = "Paired",name="Cluster") +
 #   scale_x_discrete(name="Longitutde", breaks=c(-100,0,100)) +
-  geom_polygon(data=world, colour="black", fill=NA) +
-  theme_tufte(base_size=25))
+    geom_polygon(data=world, colour="black", fill=NA) +
+    theme_tufte(base_size=25))
 dev.off()
 
 print("Done.")
